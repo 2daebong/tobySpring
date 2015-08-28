@@ -11,9 +11,9 @@
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost/tobee"/>
-        <property name="username" value="2daebong"/>
-        <property name="password" value="eoqjas1"/>
+        <property name="url" value="jdbc:mysql://10.64.55.66/toby"/>
+        <property name="username" value="root"/>
+        <property name="password" value="eoqjas12"/>
     </bean>
 
 	<bean id="userDAO" class="tobySpring.UserDAO">
