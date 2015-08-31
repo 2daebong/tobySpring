@@ -22,22 +22,17 @@ public class CalcSumTest {
 	}
 	
 	@Test
-	public void sumOfNumbers() {
-		try {
-			val = calculator.calcSum(path);
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-		assertThat(val, is(10));
+	public void concatenateString() throws IOException {
+		assertThat(calculator.concatenate(path), is("Hello World\n1234"));
 	}
 	
 	@Test
-	public void multiplyOfNumbers() {
-		try{
-			val = calculator.calcMul(path);
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		}
-		assertThat(val, is(24));
+	public void sumOfNumbers() throws IOException {
+		assertThat(calculator.calcSum(path), is(10));
+	}
+	
+	@Test
+	public void multiplyOfNumbers() throws IOException {
+		assertThat(calculator.calcMul(path), is(24));
 	}
 }

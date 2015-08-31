@@ -5,12 +5,25 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Calculator {
+	
+	public String concatenate(String filePath) throws IOException {
+		
+		LineCallback<String> callback = new LineCallback<String>() {
+			
+			public String doSomethingWithLine(String line, String value) {
+				return value += line;
+			}
+		};
+		
+		return lineReadTemplate(filePath, callback, "Hello World\n");
+	}
 
 	public Integer calcMul(String filePath) throws IOException {
 		
-		LineCallback callback = new LineCallback() {
-			public Integer doSomethingWithLine(String line, int val) {
-				return val * Integer.valueOf(line);
+		LineCallback<Integer> callback = new LineCallback<Integer>() {
+			
+			public Integer doSomethingWithLine(String line, Integer value) {
+				return value * Integer.valueOf(line);
 			}
 		};
 		
@@ -19,19 +32,19 @@ public class Calculator {
 
 	public Integer calcSum(String filePath) throws IOException {
 		
-		LineCallback callback = new LineCallback() {
-			
-			public Integer doSomethingWithLine(String line, int val) {
-				return val + Integer.valueOf(line);
+		LineCallback<Integer> callback = new LineCallback<Integer>() {
+
+			public Integer doSomethingWithLine(String line, Integer value) {
+				return value + Integer.valueOf(line);
 			}
 		};
 		
 		return lineReadTemplate(filePath, callback, 0);
 	}
 
-	private Integer lineReadTemplate(String filePath, LineCallback callback, int initVal) throws IOException {
+	private <T> T lineReadTemplate(String filePath, LineCallback<T> callback, T initVal) throws IOException {
 		BufferedReader br = null;
-		Integer val = initVal; // 변하는 부
+		T val = initVal; // 변하는 부분
 
 		try {
 			br = new BufferedReader(new FileReader(filePath));
