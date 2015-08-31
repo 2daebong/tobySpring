@@ -10,7 +10,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -80,21 +79,6 @@ public class UserDAOTest {
 
 		// then
 		
-	}
-	
-	@Ignore
-	@Test
-	public void deleteTest() {
-		// given 
-		// when
-
-		// then
-		try {
-			dao.deleteAll();
-		} catch (SQLException e) {
-			System.out.println("delete error .. ");
-			e.printStackTrace();
-		}
 	}
 	
 	@Ignore

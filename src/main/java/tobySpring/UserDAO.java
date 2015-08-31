@@ -11,59 +11,73 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 public class UserDAO {
 	private DataSource dataSource;
+	private JdbcContext jdbcContext;
 	
 	public UserDAO(){
 	}
 	
-	public void add(User user) throws ClassNotFoundException, SQLException{
-		Connection c = dataSource.getConnection();
+	public void add(final User user) throws SQLException {
 		
-		PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-		ps.setString(1, user.getId());
-		ps.setString(2, user.getName());
-		ps.setString(3, user.getPassword());
-		
-		ps.executeUpdate();
-		
-		ps.close();
-		c.close();
+		StatementStrategy st = new StatementStrategy() {
+			
+			public PreparedStatement makePreparedStatement(Connection c)
+					throws SQLException {
+					PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values (?,?,?)");
+					ps.setString(1, user.getId());
+					ps.setString(2, user.getName());
+					ps.setString(3, user.getPassword());
+					
+					return ps;
+			}
+		};
+		jdbcContext.workWithStatementStrategy(st);
 	}
 	
-	public User get(String id) throws SQLException {
-		Connection c = dataSource.getConnection();
-		
-		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
-		
-		ps.setString(1, id);
-		
-		ResultSet rs = ps.executeQuery();
+	public User get(String id) {
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		User user = null;
 		
-		if(rs.next()){
-			user = new User();
-			user.setId(rs.getString("id"));
-			user.setName(rs.getString("name"));
-			user.setPassword(rs.getString("password"));
+		try {
+			c = dataSource.getConnection();
+			ps = c.prepareStatement("select * from users where id = ?");
+			ps.setString(1, id);
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()){
+				user = new User();
+				user.setId(rs.getString("id"));
+				user.setName(rs.getString("name"));
+				user.setPassword(rs.getString("password"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				c.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if(user == null) throw new EmptyResultDataAccessException(1);
 		}
-		
-		rs.close();
-		ps.close();
-		c.close();
-		
-		if(user == null) throw new EmptyResultDataAccessException(1);
 		
 		return user;
 	}
 	
-	public void deleteAll() throws SQLException{
-		Connection c = dataSource.getConnection();
-		
-		PreparedStatement ps = c.prepareStatement("delete from users");
-		
-		ps.executeUpdate();
-		
-		ps.close();
-		c.close();
+	public void deleteAll() throws SQLException {
+		this.jdbcContext.executeSql("delete from users");
 	}
 
 	public DataSource getDataSource() {
@@ -71,21 +85,51 @@ public class UserDAO {
 	}
 
 	public void setDataSource(DataSource dataSource) {
+		this.jdbcContext = new JdbcContext();
+		
+		this.jdbcContext.setDataSource(dataSource);
+		
 		this.dataSource = dataSource;
 	}
 
-	public int getCount() throws SQLException {
-		Connection c = dataSource.getConnection();
+	public int getCount() {
+		Connection c = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int count = 0;
 		
-		PreparedStatement ps = c.prepareStatement("select count(*) from users");
-		ResultSet rs = ps.executeQuery();
-		
-		rs.next();
-		
-		int count = rs.getInt(1);
+		try {
+			c = dataSource.getConnection();
+			ps = c.prepareStatement("select count(*) from users");
+			rs = ps.executeQuery();
+			rs.next();
+			
+			count = rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				c.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		return count;
 	}
 
-	
+	public void setJdbcContext(JdbcContext jdbcContext) {
+		this.jdbcContext = jdbcContext;
+	}
+
 }
